@@ -24,32 +24,110 @@ Linear regression is a tool where you use a simple linear model $y=Ax$ to fit th
 \section{Formulation}
 Using this tool requires us to use a linear model to fit the data:\\
 
+\begin{center}
 $h_{\theta}(x) = \theta_0 + \theta_1x_1 + \theta_2x_2 + .. + \theta_nx_n$\\
+\end{center}
 
 \begin{flushright}Taking the convention $x_1 = 1$\\
 \end{flushright}
 
+\begin{center}
 $h_{\theta}(x) = \theta^Tx$ \\
+\end{center}
 
 We want to pick $\theta$ such that $h_\theta(x)$ is close to $y$ for the training examples that we do have. To do this, we will create a cost function, $J$ describing the total cost of picking a certain $\theta$\\
 
+\begin{center}
 $J(\theta) = \frac{1}{2} \sum_{i=1}^m {(h_\theta(x^{(i)}) - y^{(i)})}^2$ \\
+\end{center}
 
 This squared error cost function sums up the distance between the hypothesis and the results for each training example. The $\frac{1}{2}$ is there to simplify the derivative. Once we have a cost function to describe what we value (or want to avoid) with the model, we will attempt to pick the $\theta$ that minimizes this cost.\\
 
+\begin{center}
 $\theta = argmin_\theta J(\theta)$\\
-\\
-\\
+\end{center}
+
+
 This can be accomplished several ways:\\
 \\
 \href{normal-equations.pdf}{Normal Equations}\\
 \href{gradient-descent.pdf}{Gradient Descent}\\
 
 \section{Probabilistic Interpretation}
-TODO\\
-Section 3 of cs229 class notes 1\\
-Pending better understanding of maximum likelihood\\
+We can model our system as
+\begin{center}
+$y^{(i)} = \theta^Tx^{(i)} + \epsilon^{(i)}$
+\end{center}
+where $\epsilon^{(i)}$ is some error or noise that we can't account for. We will assume the error for each training example is independent and identically distributed (IID). Specifically, we will assume it takes on a Gaussian (Normal) Distribution.
 
+
+\begin{center}
+$\epsilon^{(i)} \sim N(0,\sigma^2)$\\
+\end{center}
+
+We can write the probabality density for $\epsilon^{(i)}$
+\begin{center}
+$\rho(\epsilon^{(i)}) = \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{(\epsilon^{(i)})^2}{2\sigma^2})$\\
+\end{center}
+
+We can write the density in terms of $x^{(i)}$ and $y^{(i)}$. Recall that $y^{(i)}$ is a function of $x^{(i)}$ and $\epsilon^{(i)}$ ($\theta$ is not a random variable). Therefore, once $x^{(i)}$ has been determined, so once $x^{(i)}$ has been determined, $y^{(i)}$ only depends on $\epsilon^{(i)}$\\
+\begin{align*}
+\rho(y^{(i)}|x^{(i)} ; \theta) &= \rho(\epsilon^{(i)})\\
+&= \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{(\epsilon^{(i)})^2}{2\sigma^2})\\
+&= \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{(y^{(i)})^2-\theta^Tx^{(i)}}{2\sigma^2})\\
+\end{align*}
+
+\begin{center}
+$\rho(y^{(i)}|x^{(i)} ; \theta) \sim N(\theta^Tx^{(i)}, \sigma^2)$\\
+\end{center}
+
+Let's add in the rest of the training examples using the design matrix $X$
+\begin{center}
+$y|X ; \theta = y|(x^{(1)} \text{ AND } x^{(2)} \text{ AND } ... \text{ AND } x^{(m)}) ; \theta $\\
+$y|X ; \theta = y|(x^{(1)} \cap x^{(2)} \cap ... \cap x^{(m)}) ; \theta $\\
+\end{center}
+
+For independent events, the probability of the intersection is the product of the event probabilities. The error for each training example is IID, so we will take the product to get the density for the entire training set.
+\begin{align*}
+\rho(y|X ; \theta) &= \prod_{i=1}^m \rho(y^{(i)}|(x^{(i)};\theta)\\
+&=\prod_{i=1}^m \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{(y^{(i)})^2-\theta^Tx^{(i)}}{2\sigma^2})\\
+\end{align*}
+
+\textbf{Maximum Likelihood} tries to find the inputs that best explain the output. In this case, we have the output $y$ and want to figure out which set of inputs $X and \theta$ best explains the data (makes $y$ most likely to happen, or have a high probability density). $X$ is already determined because we have training examples, but $\theta$ is still up for grabs. We will define a function $L$ that uses $\theta$ as an input and describes the likelihood of the output given the input.
+
+\begin{align*}
+L(\theta) &= \rho(y|X;\theta)\\
+&=\prod_{i=1}^m \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{(y^{(i)})^2-\theta^Tx^{(i)}}{2\sigma^2})\\
+\end{align*} 
+
+This is the function we want to maximize to make $y$ the most probable result of $X$. Except it isn't. The likelihood function is unwieldy. We'd much rather work with something easier. It turns out that when you want to maximize a function, you can get the same answer by maximizing a strictly increasing function of the original function. In this case, we have several products of terms, so what function makes products simpler?\\
+\\
+Log -- products become sums. We will define the (natural) log likelihood function $l$ and try to maximize that in stead of the original function $L(\theta)$.\\
+
+\begin{align*}
+l(\theta) &= \text{log}(L(\theta))\\
+&=\text{log}({\prod_{i=1}^m \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{{(y^{(i)}-\theta^Tx^{(i)})}^2}{2\sigma^2})})\\
+&=\sum_{i=1}^m \text{log} (\frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{{(y^{(i)}-\theta^Tx^{(i)})}^2}{2\sigma^2}))\\
+&=\sum_{i=1}^m \text{log} (\frac{1}{\sigma\sqrt{2\pi}}) + \text{log} (\exp(-\frac{{(y^{(i)}-\theta^Tx^{(i)})}^2}{2\sigma^2}))\\
+&= m\text{log} (\frac{1}{\sigma\sqrt{2\pi}}) + \sum_{i=1}^m\text{log} (\exp(-\frac{{(y^{(i)}-\theta^Tx^{(i)})}^2}{2\sigma^2}))\\
+&= m\text{log} (\frac{1}{\sigma\sqrt{2\pi}}) -\sum_{i=1}^m\frac{{(y^{(i)}-\theta^Tx^{(i)})}^2}{2\sigma^2}\\
+&= m\text{log} (\frac{1}{\sigma\sqrt{2\pi}}) -\frac{1}{\sigma^2}\frac{1}{2}\sum_{i=1}^m{(y^{(i)}-\theta^Tx^{(i)})}^2\\
+\end{align*} 
+
+At this point we can drop a few of the terms (constants) because they do not affect the maximization.
+\begin{align*}
+\text{arg max}_\theta l(\theta) &= \text{arg max}_\theta [m\text{log} (\frac{1}{\sigma\sqrt{2\pi}}) -\frac{1}{\sigma^2}\frac{1}{2}\sum_{i=1}^m{(y^{(i)}-\theta^Tx^{(i)})}^2]\\
+&= \text{arg max}_\theta [-\frac{1}{\sigma^2}\frac{1}{2}\sum_{i=1}^m{(y^{(i)}-\theta^Tx^{(i)})}^2]\\
+&= \text{arg max}_\theta [-\frac{1}{2}\sum_{i=1}^m{(y^{(i)}-\theta^Tx^{(i)})}^2]\\
+\end{align*}
+
+We can reframe this as a minimization problem by changing the sign on the function.
+\begin{align*}
+\text{arg max}_\theta l(\theta) &= \text{arg min}_\theta [- l(\theta)]\\
+&= \text{arg min}_\theta [\frac{1}{2}\sum_{i=1}^m{(y^{(i)}-\theta^Tx^{(i)})}^2]\\
+\end{align*}
+
+And this brings us back to the same objective described earlier in linear regression. In this case, minimizing the squared error for linear regression is the same as finding the maximum likelihood estimate of $\theta$.
 
 \end{document}
 \grid
