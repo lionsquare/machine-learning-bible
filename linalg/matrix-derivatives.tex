@@ -1,0 +1,77 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=blue,
+}
+
+\begin{document}
+
+\title{MLB Linear Algebra Toolkit: Matrix Derivatives}
+\author{Grace Shepard}
+
+\maketitle
+
+\begin{abstract}
+This document describes how to take derivatives of matrices. It covers material from section 2.1 of the \href{https://see.stanford.edu/materials/aimlcs229/cs229-notes1.pdf}{Stanford CS229 class notes 1}.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Gradient of a Function of a Matrix}
+Suppose there is some function $f(A)$ (like trace) that maps $A \in \mathbb{R}^{mxn} \rightarrow \mathbb{R}$ \\
+We can take the gradient of this function with respect to the matrix $A$\\
+\begin{center}
+\[
+\nabla_A f(A) =
+\begin{bmatrix}
+\frac{\partial}{\partial A_{11}} f(A) & \dots & \frac{\partial}{\partial A_{1n}} f(A)\\
+\dots & \dots & \dots \\    
+\frac{\partial}{\partial A_{m1}} f(A) & \dots & \frac{\partial}{\partial A_{mn}} f(A)   
+\end{bmatrix}
+\]
+\end{center}
+Next we will use the trace function to help with taking derivatives.
+
+
+\section{Helpful Matrix and Derivative Facts}
+
+\begin{equation}
+\text{tr}AB = \text{tr}BA
+\end{equation}
+
+\begin{equation}
+\text{tr}A = \text{tr}A^T
+\end{equation}
+
+\begin{equation}
+\text{tr}(A+B) = \text{tr}A +\text{tr}B
+\end{equation}
+
+\begin{equation}
+\text{tr}(aA) = a\text{tr}(A)
+\end{equation}
+\\
+\\
+\begin{equation}
+\nabla_A\text{tr}(AB) = B^T
+\end{equation}
+
+\begin{equation}
+\nabla_{A^T}f(A) = {(\nabla_Af(a))}^T
+\end{equation}
+
+\begin{equation}
+\nabla_{A}\text{tr}ABA^TC = CAB+C^TAB^T
+\end{equation}
+
+\begin{equation}
+\nabla_{A}|A| = |A|{(A^{-1})}^T
+\end{equation}
+
+
+\end{document}
+\grid

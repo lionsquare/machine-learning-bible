@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=blue,
+}
+
+\begin{document}
+
+\title{MLB Supervised Toolkit: Linear Regression}
+\author{Grace Shepard}
+
+\maketitle
+
+\begin{abstract}
+Linear regression is a tool where you use a simple linear model $y=Ax$ to fit the data.
+\end{abstract}
+
+
+\section{Formulation}
+Using this tool requires us to use a linear model to fit the data:\\
+
+$h_{\theta}(x) = \theta_0 + \theta_1x_1 + \theta_2x_2 + .. + \theta_nx_n$\\
+
+\begin{flushright}Taking the convention $x_1 = 1$\\
+\end{flushright}
+
+$h_{\theta}(x) = \theta^Tx$ \\
+
+We want to pick $\theta$ such that $h_\theta(x)$ is close to $y$ for the training examples that we do have. To do this, we will create a cost function, $J$ describing the total cost of picking a certain $\theta$\\
+
+$J(\theta) = \frac{1}{2} \sum_{i=1}^m {(h_\theta(x^{(i)}) - y^{(i)})}^2$ \\
+
+This squared error cost function sums up the distance between the hypothesis and the results for each training example. The $\frac{1}{2}$ is there to simplify the derivative. Once we have a cost function to describe what we value (or want to avoid) with the model, we will attempt to pick the $\theta$ that minimizes this cost.\\
+
+$\theta = argmin_\theta J(\theta)$\\
+\\
+\\
+This can be accomplished several ways:\\
+\\
+\href{normal-equations.pdf}{Normal Equations}\\
+\href{gradient-descent.pdf}{Gradient Descent}\\
+
+\section{Probabilistic Interpretation}
+TODO\\
+Section 3 of cs229 class notes 1\\
+Pending better understanding of maximum likelihood\\
+
+
+\end{document}
+\grid

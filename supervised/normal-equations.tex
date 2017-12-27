@@ -1,0 +1,106 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=blue,
+}
+
+\begin{document}
+
+\title{MLB Supervised Toolkit: Normal Equations}
+\author{Grace Shepard}
+
+\maketitle
+
+\begin{abstract}
+In the case of linear regression with the least squares cost function, it is possible to find the minimum $\theta$ for the cost function analytically by taking the derivative and setting it to zero. This solution is the normal equation.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Derivation}
+We start with the cost function.\\
+\\
+$J(\theta) = \frac{1}{2}\sum_{i=1}^m{(h_\theta(x^{(i)}) - y{(i)})}^2$\\ 
+\\
+\\
+In matrix form this can be written as
+\begin{align*}
+J(\theta) &= \frac{1}{2}{(X\theta-y)}^T(X\theta - y)\\
+ &= \frac{1}{2}(\theta^TX^TX\theta - y^TX\theta - \theta^TX^Ty+y^Ty)
+\end{align*}
+\\
+Notice that each of these terms is a scalar given the dimensions\\
+\\
+$\theta \in \mathbb{R}^{nx1}$\\
+$X \in \mathbb{R}^{mxn}$\\
+$y \in \mathbb{R}^{mx1}$\\
+\\
+This means that $J(\theta)=\text{tr}J(\theta)$. See \href{../linalg/matrix-derivatives.pdf}{notes on matrix derivates for equations used in this derivation.}\\
+\begin{align*}
+J(\theta) &= \text{tr}J(\theta)\\
+&= \text{tr}(\frac{1}{2}(\theta^TX^TX\theta - y^TX\theta - \theta^TX^Ty+y^Ty)) \\
+&= \frac{1}{2}(\text{tr}\theta^TX^TX\theta - \text{tr}y^TX\theta - \text{tr}\theta^TX^Ty+y^Ty) \\
+&= \frac{1}{2}(\text{tr}\theta^TX^TX\theta - \text{tr}y^TX\theta - \text{tr}y^TX\theta+y^Ty) \\
+&= \frac{1}{2}(\text{tr}\theta^TX^TX\theta - 2\text{tr}y^TX\theta+y^Ty) \\
+\end{align*}
+\\
+Now let's take the derivative of the cost function.
+\begin{align*}
+\nabla_\theta J(\theta) &= \nabla_\theta \frac{1}{2}(\text{tr}\theta^TX^TX\theta - 2\text{tr}y^TX\theta+y^Ty)\\
+&= \nabla_\theta \frac{1}{2}(\text{tr}\theta^TX^TX\theta) - \nabla_\theta \frac{1}{2}(2\text{tr}y^TX\theta)+\nabla_\theta \frac{1}{2}(y^Ty)\\
+&= \frac{1}{2} \nabla_\theta(\text{tr}\theta^TX^TX\theta) - \nabla_\theta (\text{tr}y^TX\theta)+\frac{1}{2} \nabla_\theta (y^Ty)\\
+&= \frac{1}{2} \nabla_\theta(\text{tr}\theta^TX^TX\theta) - \nabla_\theta (\text{tr}y^TX\theta)\\
+\end{align*}
+
+
+We will compute the second term first. Let $A=\theta$ and $B=y^TX$
+\begin{align*}
+\nabla_\theta (\text{tr}y^TX\theta) &= \nabla_A (\text{tr}BA)\\
+&= \nabla_A (\text{tr}AB)\\
+&= B^T\\
+&= {(y^TX)}^T\\
+&= X^Ty\\
+\end{align*}
+
+Now for the first term let $A=\theta^T$, $B=X^TX$, and $C=I$
+\begin{align*}
+\nabla_\theta(\text{tr}\theta^TX^TX\theta) &= \nabla_{A^T}(\text{tr}ABA^TC)\\
+&= {(\nabla_{A}(\text{tr}ABA^TC))}^T\\
+&= {(CAB+C^TAB^T)}^T\\
+&= B^TA^TC^T+BA^TC\\
+&= B^TA^T+BA^T\\
+&= {(X^TX)}^T{(\theta^T)}^T+X^TX{(\theta^T)}^T\\
+&= X^TX\theta+X^TX\theta\\
+&= 2X^TX\theta\\
+\end{align*}
+
+Now substitute these two terms into the first equation for the derivative.
+\begin{align*}
+\nabla_\theta J(\theta) &= \frac{1}{2} \nabla_\theta(\text{tr}\theta^TX^TX\theta) - \nabla_\theta (\text{tr}y^TX\theta) \\
+&= \frac{1}{2} 2X^TX\theta - X^Ty \\
+&= X^TX\theta - X^Ty \\
+\end{align*}
+
+Set the derivative equal to zero to find the minimum of the cost function.
+\begin{align*}
+\nabla_\theta J(\theta) &= 0\\
+X^TX\theta - X^Ty &= 0\\
+X^TX\theta &= X^Ty\\
+{(X^TX)}^{-1}X^TX\theta &= {(X^TX)}^{-1}X^Ty\\
+\theta &= {(X^TX)}^{-1}X^Ty\\
+\end{align*}
+
+
+This is the normal equation.
+\begin{equation}
+\theta = {(X^TX)}^{-1}X^Ty
+\end{equation}
+
+It solves for the optimal $\theta$ directly, but can be very computationally expensive to invert the matrix $X^TX$ if $n$ is large.
+
+\end{document}
+\grid

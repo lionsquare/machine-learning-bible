@@ -1,0 +1,81 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=blue,
+}
+
+\begin{document}
+
+\title{MLB Supervised Toolkit: Gradient Descent}
+\author{Grace Shepard}
+
+\maketitle
+
+\begin{abstract}
+    Gradient Descent is a way to minimize (or maximize) a function. It uses an iterative, intelligent guess and check method to find $\theta$ that minimizes $J(\theta)$, but can be fooled by local extrema.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Summary}
+Gradient descent uses a smart guess and check system. First, you pick a guess of $\theta$, then you change $\theta$ by moving in the direction of steepest descent of $J(\theta)$. You must be able to compute (or estimate?) $\nabla J$ to use this algorithm. \\
+
+$\theta_j := \theta_j - \alpha \frac{\partial}{\partial \theta_j}J(\theta_j)$\\
+
+$\alpha$ is called the learning rate. Set too low, the algorithm will take too many iterations to converge. Set too high, the algorithm might never converge as the steps are too large and bounce around a local minimum.\\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Least Mean Squares (Widrow-Hoff)}
+With $J=\frac{1}{2}{(h_\theta(x)-y)}^2$ we can derive the update rule for $m=1$ one training example:\\
+\\
+First, find the partial derivative.\\
+
+\begin{align*}
+\frac{\partial}{\partial \theta_j} =& \frac{\partial}{\partial \theta_j} \frac{1}{2}{(h_\theta(x) - y)}^2 \\
+%
+    =& 2\frac{1}{2}(h_\theta(x) - y) \frac{\partial}{\partial \theta_j}(h_\theta(x) - y) \\
+%
+    =& (h_\theta(x) - y) \frac{\partial}{\partial \theta_j}h_\theta(x) \\
+%
+    =& (h_\theta(x) - y) \frac{\partial}{\partial \theta_j}\sum_{i=1}^n\theta_ix_i\\
+%
+    =& (h_\theta(x) - y)x_j
+\end{align*}
+
+Substitute the partial derivative into the general update rule to get\\
+
+$\theta_j := \theta_j - \alpha (h_\theta(x) - y)x_j$ \\
+
+Note that there is no need to change $\alpha$ as we iterate because the partial derivative responds to the magnitude of the error. When we approach the solution (local minima), the derivative approaches zero and decreases the step size.\\
+\\
+We can then derive update rules when there are multiple training examples. $m > 1$\\
+
+\subsection{Batch Gradient Descent}
+Batch gradient descent looks at every training example in each iteration.\\
+\begin{flushright}(for all $j$ simulataneously)\end{flushright}
+$\theta_j := \theta_j - \alpha \sum_{i=1}^m (h_\theta(x^{(i)}) - y{(i)})x_j^{(i)}$\\
+\\
+This method for this cost function is guaranteed to converge (assuming $\alpha$ isn't too big) because there is only one local extrema.\\
+
+\subsection{Stochastic Gradient Descent}
+Stochastic gradient descent makes an update every time it looks at a new training example.\\
+\\
+\begin{samepage}
+for i=1:m
+\begin{flushright}(for all $j$ simulataneously)\end{flushright}
+\begin{center}
+$\theta_j := \theta_j - \alpha (h_\theta(x^{(i)}) - y{(i)})x_j^{(i)}$\end{center}
+end\\
+\end{samepage}
+\\
+This method is less computationally expensive, but has fewer guarantees on convergence. It can be a close approximation, however, and is often preferable when $m$ is large (large training sets).\\
+\\
+Note that you can run stochastic gradient descent and gradually decrease alpha over the iterations to help it converge.
+
+
+\end{document}
+\grid
