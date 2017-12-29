@@ -129,5 +129,21 @@ We can reframe this as a minimization problem by changing the sign on the functi
 
 And this brings us back to the same objective described earlier in linear regression. In this case, minimizing the squared error for linear regression is the same as finding the maximum likelihood estimate of $\theta$.
 
+
+\section{Locally Weighted Linear Regression}
+
+
+Choice of features ($x$, $x^2$, $x^3$ ...) can lead to underfitting or overfitting. If you have enough data, using this method can make the choice of features matter less.\\
+\\
+To implement, fit $\theta$ to minimize $\sum_{i=1}^m w^{(i)}{(y^{(i)} - \theta^Tx^{(i)})}^2$ where 
+$w^{(i)}=\exp(-\frac{{(x^{(i)} - x)}^2}{2\tau^2})$\\
+\\
+$\tau$ is the bandwidth parameter. It determines how quickly the weights fall off as you leave the local query point $x$.\\
+\\
+Notice that $w^{(i)}$ is different for every training example, but it also depends on the query point $x$. This makes it a non-parametric algorithm, meaning you have to keep every training example in memory to query the hypothesis. Unweighted linear regression is parametric because you can throw away the training set once you fit $\theta$ and still make predictions.\\
+\\
+You can use other formulas for the weights $w^{(i)}$ if you so choose.\\
+
+
 \end{document}
 \grid
