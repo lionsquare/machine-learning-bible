@@ -1,0 +1,177 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=blue,
+}
+
+\begin{document}
+
+\title{MLB Supervised Toolkit: Logistic Regression}
+\author{Grace Shepard}
+
+\maketitle
+
+\begin{abstract}
+Logistic regression is a tool where you use a logistic function to fit the data. In this case, the data takes on discrete values, like {0, 1}.
+\end{abstract}
+
+
+\section{Introduction}
+This tool is for \textbf{classification}, where the output values take on discrete values. In this case, the outputs can only take on the values {0, 1}, making it \textbf{binary classification}. We call the $y^{(i)}$ values labels. 0 is called the \textbf{negative class} and 1 is called the \textbf{positive class}\\
+
+\subsection{Logistic Function}
+The logistic, or sigmoid function is given by
+\begin{equation}
+g(z) = \frac{1}{1+e^{-z}}
+\end{equation}
+
+We will use this as our hypothesis: $h_{\theta}(x) = g(\theta^Tx) = \frac{1}{1+e^{(-\theta^Tx)}}$
+\\
+It has a few nice properties: $g(-\infty) \rightarrow 0$ and $g(\infty) \rightarrow 1$
+\\
+\\
+The derivative can also be written as follows:
+\begin{align*}
+g'(z) &= \frac{d}{dz}\frac{1}{1+e^{-z}}\\
+&= \frac{d}{dz}{(1+e^{-z})}^{-1}\\
+&= -{(1+e^{-z})}^{-2}\frac{d}{dz}(1+e^{-z})\\
+&= -{(1+e^{-z})}^{-2}(-e^{-z})\\
+&= \frac{1}{(1+e^{-z})}\frac{1}{(1+e^{-z})}e^{-z}\\
+&= g(z)\frac{e^{-z}}{(1+e^{-z})}\\
+&= g(z)\frac{e^{-z} + (1+e^{-z}) - (1+e^{-z})}{(1+e^{-z})}\\
+&= g(z)(1+\frac{e^{-z} - (1+e^{-z})}{(1+e^{-z})})\\
+&= g(z)(1-\frac{1}{(1+e^{-z})})\\
+&= g(z)(1-g(z))\\
+\end{align*}
+\\
+\\
+\\
+\\
+\begin{center}
+$h_{\theta}(x) = \theta_0 + \theta_1x_1 + \theta_2x_2 + .. + \theta_nx_n$\\
+\end{center}
+
+\begin{flushright}Taking the convention $x_1 = 1$\\
+\end{flushright}
+
+\begin{center}
+$h_{\theta}(x) = \theta^Tx$ \\
+\end{center}
+
+We want to pick $\theta$ such that $h_\theta(x)$ is close to $y$ for the training examples that we do have. To do this, we will create a cost function, $J$ describing the total cost of picking a certain $\theta$\\
+
+\begin{center}
+$J(\theta) = \frac{1}{2} \sum_{i=1}^m {(h_\theta(x^{(i)}) - y^{(i)})}^2$ \\
+\end{center}
+
+This squared error cost function sums up the distance between the hypothesis and the results for each training example. The $\frac{1}{2}$ is there to simplify the derivative. Once we have a cost function to describe what we value (or want to avoid) with the model, we will attempt to pick the $\theta$ that minimizes this cost.\\
+
+\begin{center}
+$\theta = argmin_\theta J(\theta)$\\
+\end{center}
+
+
+This can be accomplished several ways:\\
+\\
+\href{normal-equations.pdf}{Normal Equations}\\
+\href{gradient-descent.pdf}{Gradient Descent}\\
+
+\section{Probabilistic Interpretation}
+We can model our system as
+\begin{center}
+$y^{(i)} = \theta^Tx^{(i)} + \epsilon^{(i)}$
+\end{center}
+where $\epsilon^{(i)}$ is some error or noise that we can't account for. We will assume the error for each training example is independent and identically distributed (IID). Specifically, we will assume it takes on a Gaussian (Normal) Distribution.
+
+
+\begin{center}
+$\epsilon^{(i)} \sim N(0,\sigma^2)$\\
+\end{center}
+
+We can write the probabality density for $\epsilon^{(i)}$
+\begin{center}
+$\rho(\epsilon^{(i)}) = \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{(\epsilon^{(i)})^2}{2\sigma^2})$\\
+\end{center}
+
+We can write the density in terms of $x^{(i)}$ and $y^{(i)}$. Recall that $y^{(i)}$ is a function of $x^{(i)}$ and $\epsilon^{(i)}$ ($\theta$ is not a random variable). Therefore, once $x^{(i)}$ has been determined, so once $x^{(i)}$ has been determined, $y^{(i)}$ only depends on $\epsilon^{(i)}$\\
+\begin{align*}
+\rho(y^{(i)}|x^{(i)} ; \theta) &= \rho(\epsilon^{(i)})\\
+&= \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{(\epsilon^{(i)})^2}{2\sigma^2})\\
+&= \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{(y^{(i)})^2-\theta^Tx^{(i)}}{2\sigma^2})\\
+\end{align*}
+
+\begin{center}
+$\rho(y^{(i)}|x^{(i)} ; \theta) \sim N(\theta^Tx^{(i)}, \sigma^2)$\\
+\end{center}
+
+Let's add in the rest of the training examples using the design matrix $X$
+\begin{center}
+$y|X ; \theta = y|(x^{(1)} \text{ AND } x^{(2)} \text{ AND } ... \text{ AND } x^{(m)}) ; \theta $\\
+$y|X ; \theta = y|(x^{(1)} \cap x^{(2)} \cap ... \cap x^{(m)}) ; \theta $\\
+\end{center}
+
+For independent events, the probability of the intersection is the product of the event probabilities. The error for each training example is IID, so we will take the product to get the density for the entire training set.
+\begin{align*}
+\rho(y|X ; \theta) &= \prod_{i=1}^m \rho(y^{(i)}|(x^{(i)};\theta)\\
+&=\prod_{i=1}^m \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{(y^{(i)})^2-\theta^Tx^{(i)}}{2\sigma^2})\\
+\end{align*}
+
+\textbf{Maximum Likelihood} tries to find the inputs that best explain the output. In this case, we have the output $y$ and want to figure out which set of inputs $X and \theta$ best explains the data (makes $y$ most likely to happen, or have a high probability density). $X$ is already determined because we have training examples, but $\theta$ is still up for grabs. We will define a function $L$ that uses $\theta$ as an input and describes the likelihood of the output given the input.
+
+\begin{align*}
+L(\theta) &= \rho(y|X;\theta)\\
+&=\prod_{i=1}^m \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{(y^{(i)})^2-\theta^Tx^{(i)}}{2\sigma^2})\\
+\end{align*} 
+
+This is the function we want to maximize to make $y$ the most probable result of $X$. Except it isn't. The likelihood function is unwieldy. We'd much rather work with something easier. It turns out that when you want to maximize a function, you can get the same answer by maximizing a strictly increasing function of the original function. In this case, we have several products of terms, so what function makes products simpler?\\
+\\
+Log -- products become sums. We will define the (natural) log likelihood function $l$ and try to maximize that in stead of the original function $L(\theta)$.\\
+
+\begin{align*}
+l(\theta) &= \text{log}(L(\theta))\\
+&=\text{log}({\prod_{i=1}^m \frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{{(y^{(i)}-\theta^Tx^{(i)})}^2}{2\sigma^2})})\\
+&=\sum_{i=1}^m \text{log} (\frac{1}{\sigma\sqrt{2\pi}} \exp(-\frac{{(y^{(i)}-\theta^Tx^{(i)})}^2}{2\sigma^2}))\\
+&=\sum_{i=1}^m \text{log} (\frac{1}{\sigma\sqrt{2\pi}}) + \text{log} (\exp(-\frac{{(y^{(i)}-\theta^Tx^{(i)})}^2}{2\sigma^2}))\\
+&= m\text{log} (\frac{1}{\sigma\sqrt{2\pi}}) + \sum_{i=1}^m\text{log} (\exp(-\frac{{(y^{(i)}-\theta^Tx^{(i)})}^2}{2\sigma^2}))\\
+&= m\text{log} (\frac{1}{\sigma\sqrt{2\pi}}) -\sum_{i=1}^m\frac{{(y^{(i)}-\theta^Tx^{(i)})}^2}{2\sigma^2}\\
+&= m\text{log} (\frac{1}{\sigma\sqrt{2\pi}}) -\frac{1}{\sigma^2}\frac{1}{2}\sum_{i=1}^m{(y^{(i)}-\theta^Tx^{(i)})}^2\\
+\end{align*} 
+
+At this point we can drop a few of the terms (constants) because they do not affect the maximization.
+\begin{align*}
+\text{arg max}_\theta l(\theta) &= \text{arg max}_\theta [m\text{log} (\frac{1}{\sigma\sqrt{2\pi}}) -\frac{1}{\sigma^2}\frac{1}{2}\sum_{i=1}^m{(y^{(i)}-\theta^Tx^{(i)})}^2]\\
+&= \text{arg max}_\theta [-\frac{1}{\sigma^2}\frac{1}{2}\sum_{i=1}^m{(y^{(i)}-\theta^Tx^{(i)})}^2]\\
+&= \text{arg max}_\theta [-\frac{1}{2}\sum_{i=1}^m{(y^{(i)}-\theta^Tx^{(i)})}^2]\\
+\end{align*}
+
+We can reframe this as a minimization problem by changing the sign on the function.
+\begin{align*}
+\text{arg max}_\theta l(\theta) &= \text{arg min}_\theta [- l(\theta)]\\
+&= \text{arg min}_\theta [\frac{1}{2}\sum_{i=1}^m{(y^{(i)}-\theta^Tx^{(i)})}^2]\\
+\end{align*}
+
+And this brings us back to the same objective described earlier in linear regression. In this case, minimizing the squared error for linear regression is the same as finding the maximum likelihood estimate of $\theta$.
+
+
+\section{Locally Weighted Linear Regression}
+
+
+Choice of features ($x$, $x^2$, $x^3$ ...) can lead to underfitting or overfitting. If you have enough data, using this method can make the choice of features matter less.\\
+\\
+To implement, fit $\theta$ to minimize $\sum_{i=1}^m w^{(i)}{(y^{(i)} - \theta^Tx^{(i)})}^2$ where 
+$w^{(i)}=\exp(-\frac{{(x^{(i)} - x)}^2}{2\tau^2})$\\
+\\
+$\tau$ is the bandwidth parameter. It determines how quickly the weights fall off as you leave the local query point $x$.\\
+\\
+Notice that $w^{(i)}$ is different for every training example, but it also depends on the query point $x$. This makes it a non-parametric algorithm, meaning you have to keep every training example in memory to query the hypothesis. Unweighted linear regression is parametric because you can throw away the training set once you fit $\theta$ and still make predictions.\\
+\\
+You can use other formulas for the weights $w^{(i)}$ if you so choose.\\
+
+
+\end{document}
+\grid
